@@ -50,7 +50,21 @@ class MainViewModel(
     }
 
     fun loadProds(catId: String) {
-        val rr = CategoriesFilterUseCase(repository).categoryFilterDishes(catId)
+        CategoriesFilterUseCase(repository).categoryFilterDishes(catId)
+            .doOnSubscribe { action.value = defaultState }
+            .flatMap { dishes -> repository.getCategories().map { it to dishes } }
+            .map { categoriesMapper.mapDtoToState(it.first) to dishesMapper.mapDtoToState(it.second) }
+            .subscribe ({
+                action.value = MainState.Result(it.second, it.first)
+            },{
+                if (it is EmptyDishesError) {
+                    Log.d("M_empty", "пусто")
+                    action.value = MainState.Error(it.messageDishes, it)
+                } else {
+                    action.value = MainState.Error("Что то пошло не по плану", it)
+                }
+                it.printStackTrace()
+            }).track()
 
 
     }
