@@ -1,15 +1,11 @@
 package ru.skillbranch.sbdelivery.ui.main
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.schedulers.Schedulers
 import ru.skillbranch.sbdelivery.core.BaseViewModel
 import ru.skillbranch.sbdelivery.core.adapter.ProductItemState
 import ru.skillbranch.sbdelivery.core.notifier.BasketNotifier
 import ru.skillbranch.sbdelivery.core.notifier.event.BasketEvent
-import ru.skillbranch.sbdelivery.domain.filter.CategoriesFilterUseCase
 import ru.skillbranch.sbdelivery.repository.DishesRepositoryContract
 import ru.skillbranch.sbdelivery.repository.error.EmptyDishesError
 import ru.skillbranch.sbdelivery.repository.mapper.CategoriesMapper
@@ -47,26 +43,6 @@ class MainViewModel(
                 }
                 it.printStackTrace()
             }).track()
-    }
-
-    fun loadProds(catId: String) {
-        CategoriesFilterUseCase(repository).categoryFilterDishes(catId)
-            .doOnSubscribe { action.value = defaultState }
-            .flatMap { dishes -> repository.getCategories().map { it to dishes } }
-            .map { categoriesMapper.mapDtoToState(it.first) to dishesMapper.mapDtoToState(it.second) }
-            .subscribe ({
-                action.value = MainState.Result(it.second, it.first)
-            },{
-                if (it is EmptyDishesError) {
-                    Log.d("M_empty", "пусто")
-                    action.value = MainState.Error(it.messageDishes, it)
-                } else {
-                    action.value = MainState.Error("Что то пошло не по плану", it)
-                }
-                it.printStackTrace()
-            }).track()
-
-
     }
 
     fun handleAddBasket(item: ProductItemState) {

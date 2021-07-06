@@ -1,7 +1,6 @@
 package ru.skillbranch.sbdelivery.ui.main
 
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
@@ -13,7 +12,6 @@ import ru.skillbranch.sbdelivery.core.adapter.CategoriesDelegate
 import ru.skillbranch.sbdelivery.core.adapter.ProductDelegate
 import ru.skillbranch.sbdelivery.core.decor.GridPaddingItemDecoration
 import ru.skillbranch.sbdelivery.databinding.FragmentMainBinding
-import ru.skillbranch.sbdelivery.domain.filter.CategoriesFilterUseCase
 import ru.skillbranch.sbdelivery.ui.basket.BasketFragment
 import ru.skillbranch.sbdelivery.ui.search.SearchFragment
 
@@ -36,7 +34,6 @@ class MainFragment : Fragment() {
     private val categoriesAdapter by lazy {
         CategoriesDelegate().createAdapter {
             // TODO handle click
-            Log.d("M_category", viewModel.loadProds(it.categoryId).toString())
         }
     }
 
@@ -101,6 +98,12 @@ class MainFragment : Fragment() {
 
     }
 
+    //не забывать
+    // _binding = null и
+    // adapter = null и
+    // setSupportActionBar(null)
+    // чтобы не было утечки памяти
+    // это можно проверить через Leak Canary
     override fun onDestroyView() {
         binding.rvProductGrid.adapter = null
         (requireActivity() as AppCompatActivity).setSupportActionBar(null)
